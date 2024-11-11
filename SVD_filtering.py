@@ -19,7 +19,7 @@ item_factors = svd.components_.T  # 아이템 잠재 요인 행렬
 # 사용자-아이템 예상 평점 계산
 predicted_ratings = np.dot(user_factors, item_factors.T)
 
-# 1. 평점 예측을 기반으로 추천하는 함수
+
 def recommend_by_prediction(user_id, top_n=10):
     """
     SVD로 예측된 평점 기반으로 특정 사용자가 평가하지 않은 영화 중 예상 평점이 높은 상위 N개 추천
@@ -72,6 +72,6 @@ def recommend_by_knn(user_id, top_n=10):
     return recommended_movies[:top_n]
 
 
-# 예시: 사용자 ID가 1인 사용자에게 상위 10개 영화 추천
+
 print("Recommendations for User 1 by Prediction:", recommend_by_prediction(user_id=1))
 print("Recommendations for User 1 by KNN:", recommend_by_knn(user_id=2))
