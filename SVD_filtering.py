@@ -38,7 +38,7 @@ def recommend_by_prediction(user_id, top_n=10):
     # 상위 N개의 추천 영화 반환
     return sorted_recommendations[:top_n]
 
-# 2. KNN을 통해 유사한 사용자가 높게 평가한 영화를 추천하는 함수
+
 # K-최근접 이웃 모델 설정 (코사인 유사도 사용, 상위 5명의 유사한 사용자 찾기)
 knn_model = NearestNeighbors(metric='cosine', algorithm='brute', n_neighbors=5, n_jobs=-1)
 knn_model.fit(ratings_matrix)
