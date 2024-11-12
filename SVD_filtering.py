@@ -4,7 +4,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.neighbors import NearestNeighbors
 
 # MovieLens 데이터 로드
-ratings = pd.read_csv('ratings.csv')  # 'ratings.csv' 파일에는 'userId', 'movieId', 'rating' 컬럼이 있어야 합니다.
+ratings = pd.read_csv('ratings_copy.csv')  # 'ratings.csv' 파일에는 'userId', 'movieId', 'rating' 컬럼이 있어야 합니다.
 
 # 사용자-아이템 평점 행렬 생성
 ratings_matrix = ratings.pivot(index='userId', columns='movieId', values='rating')
@@ -12,13 +12,22 @@ original_ratings_matrix = ratings_matrix.copy()  # 원본 평점 행렬을 저�
 ratings_matrix = ratings_matrix.fillna(0)  # SVD용으로 빈 값 채우기
 
 # TruncatedSVD를 사용한 행렬 분해
-svd = TruncatedSVD(n_components=20, random_state=42)
-user_factors = svd.fit_transform(ratings_matrix)  # 사용자 잠재 요인 행렬
-item_factors = svd.components_.T  # 아이템 잠재 요인 행렬
+svd = TruncatedSVD(n_components=100, random_state=42)
+# user_factors = svd.fit_transform(ratings_matrix)  # 사용자 잠재 요인 행렬
+# item_factors = svd.components_.T  # 아이템 잠재 요인 행렬
 
-# 사용자-아이템 예상 평점 계산
-predicted_ratings = np.dot(user_factors, item_factors.T)
+# # 사용자-아이템 예상 평점 계산
+# predicted_ratings = np.dot(user_factors, item_factors.T)
 
+# predicted_ratings = np.clip(predicted_ratings, 0, 5)
+
+
+# 중심화된 평점 행렬로 SVD 적용
+ratings_matrix_centered = ratings_matrix.sub(ratings_matrix.mean(axis=1), axis=0)
+user_factors = svd.fit_transform(ratings_matrix_centered)
+item_factors = svd.components_.T
+predicted_ratings = np.dot(user_factors, item_factors.T) + ratings_matrix.mean(axis=1).values[:, np.newaxis]
+predicted_ratings = np.clip(predicted_ratings, 0, 5)
 
 def recommend_by_prediction(user_id, top_n=10):
     """
@@ -73,5 +82,12 @@ def recommend_by_knn(user_id, top_n=10):
 
 
 
-print("Recommendations for User 1 by Prediction:", recommend_by_prediction(user_id=1))
-print("Recommendations for User 1 by KNN:", recommend_by_knn(user_id=2))
+# print("Recommendations for User 1 by Prediction:", recommend_by_prediction(user_id=1))
+# print("Recommendations for User 1 by KNN:", recommend_by_knn(user_id=2))
+
+# 예측된 평점 확인
+user_id = 1
+user_predicted_ratings = predicted_ratings[user_id - 1]
+
+for rating in user_predicted_ratings[:20]:
+    print(rating)
