@@ -19,7 +19,6 @@ svd = TruncatedSVD(n_components=100, random_state=42)
 # predicted_ratings = np.dot(user_factors, item_factors.T)
 # predicted_ratings = np.clip(predicted_ratings, 0, 5)
 
-
 # 중심화된 평점 행렬로 SVD 적용
 ratings_matrix_centered = ratings_matrix.sub(ratings_matrix.mean(axis=1), axis=0)
 user_factors = svd.fit_transform(ratings_matrix_centered)
@@ -50,6 +49,7 @@ def recommend_by_prediction(user_id, top_n=10):
 # K-최근접 이웃 모델 설정 (코사인 유사도 사용, 상위 5명의 유사한 사용자 찾기)
 knn_model = NearestNeighbors(metric='cosine', algorithm='brute', n_neighbors=5, n_jobs=-1)
 knn_model.fit(ratings_matrix)
+
 def recommend_by_knn(user_id, top_n=10):
     """
     KNN을 통해 유사한 사용자가 높게 평가한 것으로 예측된 영화를 추천
